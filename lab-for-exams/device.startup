@@ -1,0 +1,30 @@
+# interfaces setup
+#
+# example /sbin/ifconfig eth0 10.0.0.1/24 up
+#
+# /sbin/ifconfig eth0 <IP_ADDRESS>/<PREFIX_BITS> up
+# /sbin/ifconfig eth1 <IP_ADDRESS>/<PREFIX_BITS> up
+# ...
+# /sbin/ifconfig ethN <IP_ADDRESS>/<PREFIX_BITS> up
+
+
+# static routes setup
+# example that allows to reach 100.0.0.0/16 network from this device, passing through 10.0.0.128 gateway
+# route add -net 100.0.0.0/16 gw 10.0.0.128
+#
+# route add -net <NETWORK_ADDRESS>/<PREFIX_BITS> gw <GATEWAY_IP_ADDRESS>
+
+# default routes setup
+# if it's necessary to setup a default route, example:
+# route add default gw 30.0.4.6
+#
+# route add default gw <DEFAULT_GATEWAY_IP_ADDRESS>
+
+# start FRR routing daemon
+# /etc/init.d/frr start
+
+# start bind daemon for being a DNS nameserver
+# /etc/init.d/bind start
+
+# start apache2 daemon to become a server
+# /etc/init.d/apache2 start

@@ -1,0 +1,23 @@
+;; if NOT root authority nameserver uncomment the two lines below
+;; .                   IN  NS    ROOT-SERVER.
+;; ROOT-SERVER.        IN  A     <ROOT_NAMESERVER_IP_ADDRESS>
+
+;; if root authority nameserver (if not cancel all the lines below)
+$TTL   60000
+@               IN      SOA     ROOT-SERVER.    root.ROOT-SERVER. (
+                        2006031201 ; serial
+                        28800 ; refresh
+                        14400 ; retry
+                        3600000 ; expire
+                        0 ; negative cache ttl
+                        )
+
+@               IN      NS      ROOT-SERVER.
+ROOT-SERVER.	IN	A	<THIS_DEVICE_IP_ADDRESS>
+
+;; EXAMPLE
+;; it.					IN 	NS	nameserverforit.it.
+;; nameserverforit.it.	IN 	A	10.0.0.1
+
+;; <DOMAIN_NAME_LOWER_LEVEL>.		IN 	NS	<DEVICE_NAMESERVER_LOWER_LEVEL>.<DOMAIN_NAME_LOWER_LEVEL>.
+;; <DEVICE_NAMESERVER_LOWER_LEVEL>.<DOMAIN_NAME_LOWER_LEVEL>.	IN 	A	<NAMESERVER_IP_ADDRESS>

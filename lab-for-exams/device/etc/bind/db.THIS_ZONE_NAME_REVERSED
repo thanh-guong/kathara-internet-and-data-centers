@@ -1,0 +1,24 @@
+;; EXAMPLE
+;;$TTL 60000
+;;@               IN      SOA     dnsrm3.uniroma3.it.    root.dnsrm3.uniroma3.it. (
+;;                        2006031201 ; serial
+;;                        28 ; refresh
+;;                        14400 ; retry
+;;                        3600000 ; expire
+;;                        15 ; negative cache ttl
+;;                        )
+;;@               IN      NS      dnsrm3.uniroma3.it.
+;;dnsrm3          IN      A       30.0.0.3
+;;www				IN		A		30.0.2.5
+
+$TTL 60000
+@               IN      SOA     <THIS_DEVICE_NAME>.<THIS_ZONE_NAME>.    root.<THIS_DEVICE_NAME>.<THIS_ZONE_NAME>. (
+                        2006031201 ; serial
+                        28 ; refresh
+                        14400 ; retry
+                        3600000 ; expire
+                        15 ; negative cache ttl
+                        )
+@               IN      NS      <THIS_DEVICE_NAME>.<THIS_ZONE_NAME>.
+<THIS_DEVICE_NAME>          IN      A       <THIS_DEVICE_IP_ADDRESS>
+<ANOTHER_DEVICE_NAME>		IN		A		<THAT_DEVICE_IP_ADDRESS>
