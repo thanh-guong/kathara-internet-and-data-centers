@@ -1,14 +1,38 @@
 #!/bin/sh
 
+usage()
+{
+	echo "Usage: $0 <DEVICE_NAME> <INTERFACES_NUMBER> [-r rip|ospf] [-z <ZONE>] [-s]"
+	echo ""
+	echo "Args:"
+	echo -e "\t<DEVICE_NAME>:the name for this device."
+	echo -e "\t<INTERFACES_NUMBER>: number of interfaces for this device."
+	echo ""
+	echo "Options:"
+	echo -e "\t-r rip|ospf: if this device is a router, you can configure here the routing protocol. RIP or OSPF protocols supported."
+	echo ""
+	echo -e "\t-z <ZONE>: if this device is a nameserver, you can configura here the zone. If it's root nameserver, use root as <ZONE> value."
+	echo ""
+	echo -e "\t-s: if this device is a web server, just flag this option."
+	echo ""
+	exit 1
+}
+
 # first argument is the device name
 while [ $# -gt 0 ]; do
     case "$1" in
         -r) routing_protocol=$2; shift 2 ;;
 		-z) zone=$2; shift 2 ;;
         -s) is_server='true'; shift ;;
-		*) break ;;
+		*) break;;
     esac
 done
+
+# if there aren't at least 2 arguments
+if [  $# -le 1 ]; then 
+	usage
+	exit 1
+fi
 
 device_name="$1"
 interfaces_count=$2
@@ -42,6 +66,7 @@ configureRIP()
 	
 	echo "ripd=yes" >> $device_name/etc/frr/daemons
 	
+	echo "! RIP CONFIGURATION" >> $device_name/etc/frr/frr.conf
 	echo "router rip" >> $device_name/etc/frr/frr.conf
 }
 
@@ -49,6 +74,7 @@ configureOSPF()
 {
 	echo "ospfd=yes" >> $device_name/etc/frr/daemons
 	
+	echo "! OSPF CONFIGURATION" >> $device_name/etc/frr/frr.conf
 	echo "router ospf" >> $device_name/etc/frr/frr.conf
 }
 
@@ -56,6 +82,7 @@ configureOSPF()
 if [ -n "$routing_protocol" ]; then
 	echo "FRR Routing daemon required, configuring it..."
 	
+	echo "# start FRR routing daemon" >> $device_name.startup
 	echo "/etc/init.d/frr start" >> $device_name.startup
 	
 	# create FRR directories
@@ -70,6 +97,7 @@ if [ -n "$routing_protocol" ]; then
 	# configurations default values
 	echo "zebra=yes" > $device_name/etc/frr/daemons
 	
+	echo "! ZEBRA" > $device_name/etc/frr/frr.conf
 	echo "password zebra" > $device_name/etc/frr/frr.conf
 	echo "enable password zebra" >> $device_name/etc/frr/frr.conf
 	
@@ -82,6 +110,7 @@ if [ -n "$routing_protocol" ]; then
 		*) echo "supported routing protocols: rip|ospf";;
 	esac
 	
+	echo "! LOGGING" >> $device_name/etc/frr/frr.conf
 	echo "log file /var/log/frr/frr.log" >> $device_name/etc/frr/frr.conf
 fi
 
@@ -150,6 +179,7 @@ configureZone()
 if [ -n "$zone" ]; then
 	echo "bind daemon required, configuring it..."
 	
+	echo "# start bind daemon" >> $device_name.startup
 	echo "/etc/init.d/bind start" >> $device_name.startup
 	
 	# create bind directories
@@ -185,5 +215,6 @@ if [ -n "$is_server" ]; then
 	# write (overwriting) something into index.html
 	echo $device_name > $device_name/var/www/html/index.html
 	
+	echo "# start apache2 daemon" >> $device_name.startup
 	echo "/etc/init.d/apache2 start" >> $device_name.startup
 fi
