@@ -149,7 +149,7 @@ configureZone()
 	echo -e "\tfile \"/etc/bind/db.root\";" >> $device_name/etc/bind/named.conf
 	echo -e "};" >> $device_name/etc/bind/named.conf
 	
-	echo -e "zone \"$zone\" {" >> $device_name/etc/bind/named.conf
+	echo -e "\nzone \"$zone\" {" >> $device_name/etc/bind/named.conf
 	echo -e "\ttype master;" >> $device_name/etc/bind/named.conf
 	echo -e "\tfile \"/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE\";" >> $device_name/etc/bind/named.conf
 	echo -e "};" >> $device_name/etc/bind/named.conf
@@ -162,7 +162,7 @@ configureZone()
 	
 	# db.REVERSED_ZONE_NAME_GOES_HERE
 	echo -e "\$TTL\t60000" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "@\t\t\t\tIN\t\tSOA\t\t$device_name.$zone.\t\troot.$device_name$zone. (" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
+	echo -e "@\t\t\t\tIN\t\tSOA\t\t$device_name.$zone.\t\troot.$device_name.$zone. (" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
 	echo -e "\t\t\t\t\t\t2006031201 ; serial" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
 	echo -e "\t\t\t\t\t\t28800 ; refresh" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
 	echo -e "\t\t\t\t\t\t14400 ; retry" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
