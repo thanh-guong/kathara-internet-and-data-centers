@@ -52,7 +52,7 @@ echo $is_server
 if [ -n "$interfaces_count" ]; then
 	echo "$interfaces_count interfaces required, configuring them..."
 	
-	echo "# INTERFACES" >> $device_name.startup
+	echo -e "\n# INTERFACES" >> $device_name.startup
 	
 	for i in $(seq 0 $(($interfaces_count-1)))
 	do
@@ -74,7 +74,7 @@ configureOSPF()
 {
 	echo "ospfd=yes" >> $device_name/etc/frr/daemons
 	
-	echo "! OSPF CONFIGURATION" >> $device_name/etc/frr/frr.conf
+	echo -e "\n! OSPF CONFIGURATION" >> $device_name/etc/frr/frr.conf
 	echo "router ospf" >> $device_name/etc/frr/frr.conf
 }
 
@@ -82,7 +82,7 @@ configureOSPF()
 if [ -n "$routing_protocol" ]; then
 	echo "FRR Routing daemon required, configuring it..."
 	
-	echo "# start FRR routing daemon" >> $device_name.startup
+	echo -e "\n# start FRR routing daemon" >> $device_name.startup
 	echo "/etc/init.d/frr start" >> $device_name.startup
 	
 	# create FRR directories
@@ -97,7 +97,7 @@ if [ -n "$routing_protocol" ]; then
 	# configurations default values
 	echo "zebra=yes" > $device_name/etc/frr/daemons
 	
-	echo "! ZEBRA" > $device_name/etc/frr/frr.conf
+	echo -e "\n! ZEBRA" > $device_name/etc/frr/frr.conf
 	echo "password zebra" > $device_name/etc/frr/frr.conf
 	echo "enable password zebra" >> $device_name/etc/frr/frr.conf
 	
@@ -110,7 +110,7 @@ if [ -n "$routing_protocol" ]; then
 		*) echo "supported routing protocols: rip|ospf";;
 	esac
 	
-	echo "! LOGGING" >> $device_name/etc/frr/frr.conf
+	echo -e "\n! LOGGING" >> $device_name/etc/frr/frr.conf
 	echo "log file /var/log/frr/frr.log" >> $device_name/etc/frr/frr.conf
 fi
 
@@ -179,7 +179,7 @@ configureZone()
 if [ -n "$zone" ]; then
 	echo "bind daemon required, configuring it..."
 	
-	echo "# start bind daemon" >> $device_name.startup
+	echo -e "\n# start bind daemon" >> $device_name.startup
 	echo "/etc/init.d/bind start" >> $device_name.startup
 	
 	# create bind directories
@@ -215,6 +215,6 @@ if [ -n "$is_server" ]; then
 	# write (overwriting) something into index.html
 	echo $device_name > $device_name/var/www/html/index.html
 	
-	echo "# start apache2 daemon" >> $device_name.startup
+	echo -e "\n# start apache2 daemon" >> $device_name.startup
 	echo "/etc/init.d/apache2 start" >> $device_name.startup
 fi
