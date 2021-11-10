@@ -2,6 +2,8 @@
 
 usage()
 {
+	echo "ATTENTION: you need to create lab.conf in order to use this script."
+	echo ""
 	echo "Usage: $0 <DEVICE_NAME> <INTERFACES_NUMBER> [-r rip|ospf] [-z <ZONE>] [-s]"
 	echo ""
 	echo "Args:"
