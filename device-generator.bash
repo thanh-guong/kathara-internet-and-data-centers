@@ -18,6 +18,22 @@ usage()
 	exit 1
 }
 
+# ===============================================================================================================================================
+# CHECKS
+# if there aren't at least 2 arguments
+if [  $# -le 1 ]; then 
+	usage
+	exit 1
+fi
+
+# if lab.conf doesn't exist, create it before
+if [ ! -f lab.conf ]; then
+    echo "lab.conf was not found. Create it before launching this script."
+	exit 1
+fi
+
+# ===============================================================================================================================================
+# SETUP
 # first argument is the device name
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -28,45 +44,48 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-# if there aren't at least 2 arguments
-if [  $# -le 1 ]; then 
-	usage
-	exit 1
-fi
-
 device_name="$1"
 interfaces_count=$2
+
+echo " ==================== $device_name"
 
 mkdir $device_name
 touch $device_name.startup
 
-# clean if exists
+# clean if startup file exists
 echo > $device_name.startup
 
-echo $interfaces_count
-echo $routing_protocol
-echo $zone
-echo $is_server
+# ===============================================================================================================================================
+# INTERFACES
+echo "$interfaces_count interfaces required, configuring them..."
 
-# if interfaces_count not null
-if [ -n "$interfaces_count" ]; then
-	echo "$interfaces_count interfaces required, configuring them..."
-	
-	echo -e "\n# INTERFACES" >> $device_name.startup
-	
-	for i in $(seq 0 $(($interfaces_count-1)))
-	do
-		echo "/sbin/ifconfig eth$i <IP_ADDRESS>/<PREFIX_BITS> up" >> $device_name.startup
-	done
-fi
+echo -e "\n# INTERFACES" >> $device_name.startup
 
+for i in $(seq 0 $(($interfaces_count-1)))
+do
+	echo "/sbin/ifconfig eth$i <IP_ADDRESS>/<PREFIX_BITS> up" >> $device_name.startup
+done
+
+# ===============================================================================================================================================
+# LAB.CONF
+# adding device in lab.conf
+echo "# ==================== $device_name" >> lab.conf
+
+for i in $(seq 0 $(($interfaces_count-1))); do
+	echo "$device_name[$i]=\"\"" >> lab.conf
+done
+
+echo "" >> lab.conf
+
+# ===============================================================================================================================================
+# ROUTING PROTOCOL
 configureRIP()
 {
 	echo "Configuring $device_name/etc/frr/daemons"
 	
 	echo "ripd=yes" >> $device_name/etc/frr/daemons
 	
-	echo "! RIP CONFIGURATION" >> $device_name/etc/frr/frr.conf
+	echo -e "\n! RIP CONFIGURATION" >> $device_name/etc/frr/frr.conf
 	echo "router rip" >> $device_name/etc/frr/frr.conf
 }
 
@@ -113,6 +132,9 @@ if [ -n "$routing_protocol" ]; then
 	echo -e "\n! LOGGING" >> $device_name/etc/frr/frr.conf
 	echo "log file /var/log/frr/frr.log" >> $device_name/etc/frr/frr.conf
 fi
+
+# ===============================================================================================================================================
+# DNS
 
 configureRootZone()
 {
@@ -213,6 +235,8 @@ if [ -n "$zone" ]; then
 	esac
 fi
 
+# ===============================================================================================================================================
+# SERVER
 # if is_server not null
 if [ -n "$is_server" ]; then
 	echo "apache2 daemon required, launching it"
