@@ -183,8 +183,8 @@ configureZone()
 	echo -e "\t\t\t\t\t\t0 ; negative cache ttl" >> $device_name/etc/bind/db.$reversed_zone
 	echo -e "\t\t\t\t\t\t)\n" >> $device_name/etc/bind/db.$reversed_zone
 	echo -e "@\t\t\t\tIN\t\tNS\t\t$device_name.$zone." >> $device_name/etc/bind/db.$reversed_zone
-	echo -e "$device_name.\tIN\t\tA\t\t<THIS-DEVICE-IP-ADDRESS>\n" >> $device_name/etc/bind/db.$reversed_zone
-	echo -e ";; <ANOTHER_DEVICE_NAME>.\tIN\t\tA\t\t<THAT-DEVICE-IP-ADDRESS>" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "$device_name\tIN\t\tA\t\t<THIS-DEVICE-IP-ADDRESS>\n" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e ";; <ANOTHER_DEVICE_NAME>\tIN\t\tA\t\t<THAT-DEVICE-IP-ADDRESS>" >> $device_name/etc/bind/db.$reversed_zone
 	echo -e ";; ..." >> $device_name/etc/bind/db.$reversed_zone
 }
 
