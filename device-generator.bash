@@ -139,6 +139,19 @@ configureRootZone()
 
 configureZone()
 {
+	IFS=. read -ra line <<< $zone
+	let x=${#line[@]}-1;
+	
+	# set as first, the last element separed by dots
+	reversed_zone="${line[$x]}"
+	let x--;
+	
+	# for every other element separed by dots, concatenate adding a dot
+	while [ "$x" -ge 0 ]; do 
+		reversed_zone="$reversed_zone.${line[$x]}"
+		let x--; 
+	done
+
 	# db.root
 	echo -e ".\t\t\t\tIN\tNS\tROOT-SERVER." >> $device_name/etc/bind/db.root
 	echo -e "ROOT-SERVER.\tIN\tA\t<ROOT-AUTHORITY-NAMESERVER-IP-ADDRESS>" >> $device_name/etc/bind/db.root
@@ -151,28 +164,28 @@ configureZone()
 	
 	echo -e "\nzone \"$zone\" {" >> $device_name/etc/bind/named.conf
 	echo -e "\ttype master;" >> $device_name/etc/bind/named.conf
-	echo -e "\tfile \"/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE\";" >> $device_name/etc/bind/named.conf
+	echo -e "\tfile \"/etc/bind/db.$reversed_zone\";" >> $device_name/etc/bind/named.conf
 	echo -e "};" >> $device_name/etc/bind/named.conf
 	
-	# create db.REVERSED_ZONE_NAME_GOES_HERE
-	touch $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
+	# create db.$reversed_zone
+	touch $device_name/etc/bind/db.$reversed_zone
 	
-	# clean db.REVERSED_ZONE_NAME_GOES_HERE
-	echo > $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
+	# clean db.$reversed_zone
+	echo > $device_name/etc/bind/db.$reversed_zone
 	
-	# db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "\$TTL\t60000" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "@\t\t\t\tIN\t\tSOA\t\t$device_name.$zone.\t\troot.$device_name.$zone. (" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "\t\t\t\t\t\t2006031201 ; serial" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "\t\t\t\t\t\t28800 ; refresh" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "\t\t\t\t\t\t14400 ; retry" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "\t\t\t\t\t\t3600000 ; expire" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "\t\t\t\t\t\t0 ; negative cache ttl" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "\t\t\t\t\t\t)\n" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "@\t\t\t\tIN\t\tNS\t\t$device_name.$zone." >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e "$device_name.\tIN\t\tA\t\t<THIS-DEVICE-IP-ADDRESS>\n" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e ";; <ANOTHER_DEVICE_NAME>.\tIN\t\tA\t\t<THAT-DEVICE-IP-ADDRESS>" >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
-	echo -e ";; ..." >> $device_name/etc/bind/db.REVERSED_ZONE_NAME_GOES_HERE
+	# db.$reversed_zone
+	echo -e "\$TTL\t60000" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "@\t\t\t\tIN\t\tSOA\t\t$device_name.$zone.\t\troot.$device_name.$zone. (" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "\t\t\t\t\t\t2006031201 ; serial" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "\t\t\t\t\t\t28800 ; refresh" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "\t\t\t\t\t\t14400 ; retry" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "\t\t\t\t\t\t3600000 ; expire" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "\t\t\t\t\t\t0 ; negative cache ttl" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "\t\t\t\t\t\t)\n" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "@\t\t\t\tIN\t\tNS\t\t$device_name.$zone." >> $device_name/etc/bind/db.$reversed_zone
+	echo -e "$device_name.\tIN\t\tA\t\t<THIS-DEVICE-IP-ADDRESS>\n" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e ";; <ANOTHER_DEVICE_NAME>.\tIN\t\tA\t\t<THAT-DEVICE-IP-ADDRESS>" >> $device_name/etc/bind/db.$reversed_zone
+	echo -e ";; ..." >> $device_name/etc/bind/db.$reversed_zone
 }
 
 # if is_nameserver not null
