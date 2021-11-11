@@ -95,6 +95,7 @@ configureRIP()
 	# redistribute routing on connected devices
 	echo "# redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
 	echo "redistribute connected" >> $device_name/etc/frr/frr.conf
+	echo "" >> $device_name/etc/frr/frr.conf
 	
 	# configure networks
 	echo "# speak RIP protocol on these networks" >> $device_name/etc/frr/frr.conf
