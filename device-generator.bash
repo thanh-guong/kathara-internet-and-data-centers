@@ -89,6 +89,19 @@ configureRIP()
 	
 	echo -e "\n! RIP CONFIGURATION" >> $device_name/etc/frr/frr.conf
 	echo "router rip" >> $device_name/etc/frr/frr.conf
+	
+	echo "" >> $device_name/etc/frr/frr.conf
+	
+	# redistribute routing on connected devices
+	echo "# redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
+	echo "redistribute connected" >> $device_name/etc/frr/frr.conf
+	
+	# configure networks
+	echo "# speak RIP protocol on these networks" >> $device_name/etc/frr/frr.conf
+	for i in $(seq 0 $(($interfaces_count-1))); do
+		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS>" >> $device_name/etc/frr/frr.conf
+	done
+	
 }
 
 configureOSPF()
@@ -97,6 +110,18 @@ configureOSPF()
 	
 	echo -e "\n! OSPF CONFIGURATION" >> $device_name/etc/frr/frr.conf
 	echo "router ospf" >> $device_name/etc/frr/frr.conf
+	echo "" >> $device_name/etc/frr/frr.conf
+	
+	# redistribute routing on connected devices
+	echo "# redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
+	echo "redistribute connected" >> $device_name/etc/frr/frr.conf
+	echo "" >> $device_name/etc/frr/frr.conf
+	
+	# configure networks
+	echo "# speak OSPF protocol on these networks" >> $device_name/etc/frr/frr.conf
+	for i in $(seq 0 $(($interfaces_count-1))); do
+		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS> area <AREA_ID>" >> $device_name/etc/frr/frr.conf
+	done
 }
 
 # if routing_protocol not null
@@ -118,8 +143,8 @@ if [ -n "$routing_protocol" ]; then
 	# configurations default values
 	echo "zebra=yes" > $device_name/etc/frr/daemons
 	
-	echo -e "\n! ZEBRA" > $device_name/etc/frr/frr.conf
-	echo "password zebra" > $device_name/etc/frr/frr.conf
+	echo -e "! ZEBRA" > $device_name/etc/frr/frr.conf
+	echo "password zebra" >> $device_name/etc/frr/frr.conf
 	echo "enable password zebra" >> $device_name/etc/frr/frr.conf
 	
 	echo "service integrated-vtysh-config" > $device_name/etc/frr/vtysh.conf
