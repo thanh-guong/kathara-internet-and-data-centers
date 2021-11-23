@@ -4,19 +4,23 @@ usage()
 {
 	echo "ATTENTION: you need to create lab.conf in order to use this script."
 	echo ""
-	echo "Usage: $0 <DEVICE_NAME> <INTERFACES_NUMBER> [-r rip|ospf] [-z <ZONE>] [-s]"
+	echo "Usage: $0 [-rip] [-ospf <AREA_ID>] [-bgp <AS_BGP_ID> <NEIGHBORS_COUNT> <ANNOUNCEMENTS_COUNT>] [-z <ZONE>] [-s] <DEVICE_NAME> <INTERFACES_NUMBER> "
 	echo ""
-	echo "Args:"
-	echo -e "\t<DEVICE_NAME>:the name for this device."
-	echo -e "\t<INTERFACES_NUMBER>: number of interfaces for this device."
 	echo ""
 	echo "Options:"
-	echo -e "\t-r rip|ospf: if this device is a router, you can configure here the routing protocol. RIP or OSPF protocols supported."
+	echo -e "\t-rip: Use this option if this device is a router running RIP protocol."
+	echo ""
+	echo -e "\t-ospf <AREA_ID>: Use this option if this device is a router running OSPF protocol. <AREA_ID> is the OSPF area id, for example 1.1.1.1 or 0.0.0.0 (if backbone)."
+	echo ""
+	echo -e "\t-bgp <AS_BGP_ID> <NEIGHBORS_COUNT> <ANNOUNCEMENTS_COUNT>: Use this option if this device is a router running BGP protocol. <AS_BGP_ID> is the e-BGP AS (Autonomous System) id for this router. <NEIGHBORS_COUNT> is the e-BGP neighbors number. <ANNOUNCEMENTS_COUNT> is the number of announcements that this router has to do."
 	echo ""
 	echo -e "\t-z <ZONE>: if this device is a nameserver, you can configura here the zone. If it's root nameserver, use root as <ZONE> value."
 	echo ""
 	echo -e "\t-s: if this device is a web server, just flag this option."
 	echo ""
+	echo "Args:"
+	echo -e "\t<DEVICE_NAME>:the name for this device."
+	echo -e "\t<INTERFACES_NUMBER>: number of interfaces for this device."
 	exit 1
 }
 
@@ -39,9 +43,30 @@ fi
 # first argument is the device name
 while [ $# -gt 0 ]; do
     case "$1" in
-        -r) routing_protocol=$2; shift 2 ;;
-		-z) zone=$2; shift 2 ;;
-        -s) is_server='true'; shift ;;
+        -rip)
+			rip='true'
+			shift
+			;;
+		-ospf)
+			ospf='true'
+			area_id="$2"
+			shift 2
+			;;
+		-bgp)
+			bgp='true'
+			as_bgp_id=$2
+			neighbors_count=$3
+			announcements_count=$4
+			shift 4
+			;;
+		-z)
+			zone=$2
+			shift 2
+		;;
+        -s)
+			is_server='true'
+			shift
+			;;
 		*) break;;
     esac
 done
@@ -83,22 +108,26 @@ echo "" >> lab.conf
 # ROUTING PROTOCOL
 configureRIP()
 {
-	echo "Configuring $device_name/etc/frr/daemons"
-	
+	echo "Configuring RIP protocol."
+
+	# $device_name/etc/frr/daemons
 	echo "ripd=yes" >> $device_name/etc/frr/daemons
 	
+	# $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
 	echo -e "\n! RIP CONFIGURATION" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
 	echo "router rip" >> $device_name/etc/frr/frr.conf
 	
 	echo "" >> $device_name/etc/frr/frr.conf
 	
 	# redistribute routing on connected devices
-	echo "# redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
+	echo "! redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
 	echo "redistribute connected" >> $device_name/etc/frr/frr.conf
 	echo "" >> $device_name/etc/frr/frr.conf
 	
 	# configure networks
-	echo "# speak RIP protocol on these networks" >> $device_name/etc/frr/frr.conf
+	echo "! speak RIP protocol on these networks" >> $device_name/etc/frr/frr.conf
 	for i in $(seq 0 $(($interfaces_count-1))); do
 		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS>" >> $device_name/etc/frr/frr.conf
 	done
@@ -107,26 +136,75 @@ configureRIP()
 
 configureOSPF()
 {
+	echo "Configuring OSPF protocol."
+
+	# $device_name/etc/frr/daemons
 	echo "ospfd=yes" >> $device_name/etc/frr/daemons
 	
+	# $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
 	echo -e "\n! OSPF CONFIGURATION" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
 	echo "router ospf" >> $device_name/etc/frr/frr.conf
 	echo "" >> $device_name/etc/frr/frr.conf
 	
 	# redistribute routing on connected devices
-	echo "# redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
+	echo "! redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
 	echo "redistribute connected" >> $device_name/etc/frr/frr.conf
 	echo "" >> $device_name/etc/frr/frr.conf
 	
 	# configure networks
-	echo "# speak OSPF protocol on these networks" >> $device_name/etc/frr/frr.conf
+	echo "! speak OSPF protocol on these networks" >> $device_name/etc/frr/frr.conf
 	for i in $(seq 0 $(($interfaces_count-1))); do
-		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS> area <AREA_ID>" >> $device_name/etc/frr/frr.conf
+		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS> area $area_id" >> $device_name/etc/frr/frr.conf
 	done
 }
 
-# if routing_protocol not null
-if [ -n "$routing_protocol" ]; then
+configureBGP()
+{
+	echo "Configuring BGP protocol."
+
+	# $device_name/etc/frr/daemons
+	echo "bgpd=yes" >> $device_name/etc/frr/daemons
+	
+	# $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo -e "\n! BGP CONFIGURATION" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "router bgp $as_bgp_id" >> $device_name/etc/frr/frr.conf
+	echo "" >> $device_name/etc/frr/frr.conf
+	
+	# filters control
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "! FILTERS CONTROL" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "! uncomment the line below if ..." >> $device_name/etc/frr/frr.conf
+	echo "! no bgp ebgp-requires-policy" >> $device_name/etc/frr/frr.conf
+	echo "! uncomment the line below if ..." >> $device_name/etc/frr/frr.conf
+	echo "! no bgp network import-check" >> $device_name/etc/frr/frr.conf
+	echo "" >> $device_name/etc/frr/frr.conf
+	
+	# neighbors configuration
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "! NEIGHBORS" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
+	for i in $(seq 0 $(($neighbors_count-1))); do
+		echo "neighbor <NEIGHBOR$i_IP_ADDRESS> remote-as <NEIGHBOR$i_AS_ID>" >> $device_name/etc/frr/frr.conf
+		echo "neighbor <NEIGHBOR$i_IP_ADDRESS> description $device_name router for <NEIGHBOR$i_AS_ID>" >> $device_name/etc/frr/frr.conf
+	done
+	echo "" >> $device_name/etc/frr/frr.conf
+	
+	# announcecment configuration
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "! BGP announcements" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
+	for i in $(seq 0 $(($announcements_count-1))); do
+		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS>" >> $device_name/etc/frr/frr.conf
+	done
+}
+
+# if one routing protocol is chosen
+if [ -n "$rip$ospf$bgp" ]; then
 	echo "FRR Routing daemon required, configuring it..."
 	
 	echo -e "\n# start FRR routing daemon" >> $device_name.startup
@@ -150,12 +228,21 @@ if [ -n "$routing_protocol" ]; then
 	
 	echo "service integrated-vtysh-config" > $device_name/etc/frr/vtysh.conf
 	echo "hostname $device_name-frr" >> $device_name/etc/frr/vtysh.conf
+	 
+	# RIP routing protocol configuration
+	if [ -n "$rip" ]; then
+		configureRIP
+	fi
 	
-	case "${routing_protocol}" in
-		rip) configureRIP $device_name;;
-		ospf) configureOSPF $device_name;;
-		*) echo "supported routing protocols: rip|ospf";;
-	esac
+	# OSPF routing protocol configuration
+	if [ -n "$ospf" ]; then
+		configureOSPF
+	fi
+	
+	# BGP routing protocol configuration
+	if [ -n "$bgp" ]; then
+		configureBGP
+	fi
 	
 	echo -e "\n! LOGGING" >> $device_name/etc/frr/frr.conf
 	echo "log file /var/log/frr/frr.log" >> $device_name/etc/frr/frr.conf
