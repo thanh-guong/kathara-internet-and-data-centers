@@ -121,9 +121,11 @@ configureRIP()
 	
 	echo "" >> $device_name/etc/frr/frr.conf
 	
-	# redistribute routing on connected devices
+	# redistribute routing
 	echo "! redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
 	echo "redistribute connected" >> $device_name/etc/frr/frr.conf
+	echo "! redistribute bgp routing table into kernel routing table" >> $device_name/etc/frr/frr.conf
+	echo "! redistribute bgp" >> $device_name/etc/frr/frr.conf
 	echo "" >> $device_name/etc/frr/frr.conf
 	
 	# configure networks
@@ -151,6 +153,8 @@ configureOSPF()
 	# redistribute routing on connected devices
 	echo "! redistribute routing on connected devices" >> $device_name/etc/frr/frr.conf
 	echo "redistribute connected" >> $device_name/etc/frr/frr.conf
+	echo "! redistribute bgp routing table into kernel routing table" >> $device_name/etc/frr/frr.conf
+	echo "! redistribute bgp" >> $device_name/etc/frr/frr.conf
 	echo "" >> $device_name/etc/frr/frr.conf
 	
 	# configure networks
@@ -178,9 +182,9 @@ configureBGP()
 	echo "!" >> $device_name/etc/frr/frr.conf
 	echo "! FILTERS CONTROL" >> $device_name/etc/frr/frr.conf
 	echo "!" >> $device_name/etc/frr/frr.conf
-	echo "! uncomment the line below if ..." >> $device_name/etc/frr/frr.conf
+	echo "! uncomment the line below if you want to disable checks on inbound and outbound announcements (by default, all announcements are denied)" >> $device_name/etc/frr/frr.conf
 	echo "! no bgp ebgp-requires-policy" >> $device_name/etc/frr/frr.conf
-	echo "! uncomment the line below if ..." >> $device_name/etc/frr/frr.conf
+	echo "! uncomment the line below if you want to announce routes even if those routes doesn't appear in kernel routing table" >> $device_name/etc/frr/frr.conf
 	echo "! no bgp network import-check" >> $device_name/etc/frr/frr.conf
 	echo "" >> $device_name/etc/frr/frr.conf
 	
@@ -196,7 +200,7 @@ configureBGP()
 	
 	# announcecment configuration
 	echo "!" >> $device_name/etc/frr/frr.conf
-	echo "! BGP announcements" >> $device_name/etc/frr/frr.conf
+	echo "! BGP ANNOUNCEMENTS" >> $device_name/etc/frr/frr.conf
 	echo "!" >> $device_name/etc/frr/frr.conf
 	for i in $(seq 0 $(($announcements_count-1))); do
 		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS>" >> $device_name/etc/frr/frr.conf
