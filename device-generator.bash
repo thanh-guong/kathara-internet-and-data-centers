@@ -189,8 +189,8 @@ configureBGP()
 	echo "! NEIGHBORS" >> $device_name/etc/frr/frr.conf
 	echo "!" >> $device_name/etc/frr/frr.conf
 	for i in $(seq 0 $(($neighbors_count-1))); do
-		echo "neighbor <NEIGHBOR$i_IP_ADDRESS> remote-as <NEIGHBOR$i_AS_ID>" >> $device_name/etc/frr/frr.conf
-		echo "neighbor <NEIGHBOR$i_IP_ADDRESS> description $device_name router for <NEIGHBOR$i_AS_ID>" >> $device_name/etc/frr/frr.conf
+		echo "neighbor <NEIGHBOR${i}_IP_ADDRESS> remote-as <NEIGHBOR${i}_AS_ID>" >> $device_name/etc/frr/frr.conf
+		echo "neighbor <NEIGHBOR${i}_IP_ADDRESS> description $device_name router for <NEIGHBOR${i}_AS_ID>" >> $device_name/etc/frr/frr.conf
 	done
 	echo "" >> $device_name/etc/frr/frr.conf
 	
