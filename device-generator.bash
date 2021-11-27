@@ -175,6 +175,10 @@ configureBGP()
 	echo "!" >> $device_name/etc/frr/frr.conf
 	echo -e "\n! BGP CONFIGURATION" >> $device_name/etc/frr/frr.conf
 	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "debug bgp keepalives" >> $device_name/etc/frr/frr.conf
+	echo "debug bgp updates in" >> $device_name/etc/frr/frr.conf
+	echo "debug bgp updates out" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
 	echo "router bgp $as_bgp_id" >> $device_name/etc/frr/frr.conf
 	echo "" >> $device_name/etc/frr/frr.conf
 	
@@ -182,7 +186,7 @@ configureBGP()
 	echo "!" >> $device_name/etc/frr/frr.conf
 	echo "! FILTERS CONTROL" >> $device_name/etc/frr/frr.conf
 	echo "!" >> $device_name/etc/frr/frr.conf
-	echo "! uncomment the line below if you want to disable checks on inbound and outbound announcements (by default, all announcements are denied)" >> $device_name/etc/frr/frr.conf
+	echo "! uncomment the line below if you want to disable checks on inbound and outbound announcements (by default, all announcements are denied). If you don't specify any policy, uncomment the line below." >> $device_name/etc/frr/frr.conf
 	echo "! no bgp ebgp-requires-policy" >> $device_name/etc/frr/frr.conf
 	echo "! uncomment the line below if you want to announce routes even if those routes doesn't appear in kernel routing table" >> $device_name/etc/frr/frr.conf
 	echo "! no bgp network import-check" >> $device_name/etc/frr/frr.conf
@@ -194,7 +198,7 @@ configureBGP()
 	echo "!" >> $device_name/etc/frr/frr.conf
 	for i in $(seq 0 $(($neighbors_count-1))); do
 		echo "neighbor <NEIGHBOR${i}_IP_ADDRESS> remote-as <NEIGHBOR${i}_AS_ID>" >> $device_name/etc/frr/frr.conf
-		echo "neighbor <NEIGHBOR${i}_IP_ADDRESS> description $device_name router for <NEIGHBOR${i}_AS_ID>" >> $device_name/etc/frr/frr.conf
+		# echo "neighbor <NEIGHBOR${i}_IP_ADDRESS> description $device_name router for <NEIGHBOR${i}_AS_ID>" >> $device_name/etc/frr/frr.conf
 	done
 	echo "" >> $device_name/etc/frr/frr.conf
 	
