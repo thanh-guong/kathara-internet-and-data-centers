@@ -209,6 +209,29 @@ configureBGP()
 	for i in $(seq 0 $(($announcements_count-1))); do
 		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS>" >> $device_name/etc/frr/frr.conf
 	done
+	
+	# policies configuration
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "! POLICIES" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
+	for i in $(seq 0 $(($neighbors_count-1))); do
+		echo "! neighbor <NEIGHBOR${i}_IP_ADDRESS> prefix-list <IN_PREFIX_LIST_NAME> in" >> $device_name/etc/frr/frr.conf
+		echo "! neighbor <NEIGHBOR${i}_IP_ADDRESS> prefix-list <OUT_PREFIX_LIST_NAME> out" >> $device_name/etc/frr/frr.conf
+		echo "! neighbor <NEIGHBOR${i}_IP_ADDRESS> route-map <IN_ROUTE_MAP_NAME> in" >> $device_name/etc/frr/frr.conf
+		echo "! neighbor <NEIGHBOR${i}_IP_ADDRESS> route-map <OUT_ROUTE_MAP_NAME> out" >> $device_name/etc/frr/frr.conf
+		echo "" >> $device_name/etc/frr/frr.conf
+	done
+	
+	echo "! policies examples" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "! route-map metricOut permit 10" >> $device_name/etc/frr/frr.conf
+	echo "! match ip address myAggregate" >> $device_name/etc/frr/frr.conf
+	echo "! set metric 10" >> $device_name/etc/frr/frr.conf
+	echo "!" >> $device_name/etc/frr/frr.conf
+	echo "! route-map localPrefIn permit 10" >> $device_name/etc/frr/frr.conf
+	echo "! set local-preference 90" >> $device_name/etc/frr/frr.conf
+	
+	echo "" >> $device_name/etc/frr/frr.conf
 }
 
 # if one routing protocol is chosen
