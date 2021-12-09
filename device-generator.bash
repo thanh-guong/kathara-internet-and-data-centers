@@ -4,7 +4,7 @@ usage()
 {
 	echo "ATTENTION: you need to create lab.conf in order to use this script."
 	echo ""
-	echo "Usage: $0 [-rip] [-ospf <AREA_ID>] [-bgp <AS_BGP_ID> <NEIGHBORS_COUNT> <ANNOUNCEMENTS_COUNT>] [-z <ZONE>] [-s] <DEVICE_NAME> <INTERFACES_NUMBER> "
+	echo "Usage: $0 [-rip] [-ospf <AREA_ID>] [-bgp <AS_BGP_ID> <NEIGHBORS_COUNT>] [-z <ZONE>] [-s] <DEVICE_NAME> <INTERFACES_NUMBER> "
 	echo ""
 	echo ""
 	echo "Options:"
@@ -12,7 +12,7 @@ usage()
 	echo ""
 	echo -e "\t-ospf <AREA_ID>: Use this option if this device is a router running OSPF protocol. <AREA_ID> is the OSPF area id, for example 1.1.1.1 or 0.0.0.0 (if backbone)."
 	echo ""
-	echo -e "\t-bgp <AS_BGP_ID> <NEIGHBORS_COUNT> <ANNOUNCEMENTS_COUNT>: Use this option if this device is a router running BGP protocol. <AS_BGP_ID> is the e-BGP AS (Autonomous System) id for this router. <NEIGHBORS_COUNT> is the e-BGP neighbors number. <ANNOUNCEMENTS_COUNT> is the number of announcements that this router has to do."
+	echo -e "\t-bgp <AS_BGP_ID> <NEIGHBORS_COUNT>: Use this option if this device is a router running BGP protocol. <AS_BGP_ID> is the e-BGP AS (Autonomous System) id for this router. <NEIGHBORS_COUNT> is the e-BGP neighbors number."
 	echo ""
 	echo -e "\t-z <ZONE>: if this device is a nameserver, you can configura here the zone. If it's root nameserver, use root as <ZONE> value."
 	echo ""
@@ -56,7 +56,6 @@ while [ $# -gt 0 ]; do
 			bgp='true'
 			as_bgp_id=$2
 			neighbors_count=$3
-			announcements_count=$4
 			shift 4
 			;;
 		-z)
@@ -206,7 +205,7 @@ configureBGP()
 	echo "!" >> $device_name/etc/frr/frr.conf
 	echo "! BGP ANNOUNCEMENTS" >> $device_name/etc/frr/frr.conf
 	echo "!" >> $device_name/etc/frr/frr.conf
-	for i in $(seq 0 $(($announcements_count-1))); do
+	for i in $(seq 0 $(($neighbors_count-1))); do
 		echo "network <NETWORK_ADDRESS>/<PREFIX_BITS>" >> $device_name/etc/frr/frr.conf
 	done
 	

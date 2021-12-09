@@ -27,9 +27,9 @@ Example: `bash device-generator.bash -ospf 0.0.0.0 ospfrouter 3` generates a rou
 
 ### BGP
 
-`bash device-generator.bash -bgp <BGP_AS_ID> <NEIGHBORS_COUNT> <ANNOUNCEMENTS_COUNT> <ROUTER_NAME> <INTERFACES_COUNT>` generates configuration files for a BGP router with BGP_AS_ID as BGP AS (Autonomous System) identificator, with NEIGHBORS_COUNT BGP neighbors, ANNOUNCEMENTS_COUNT announcements to execute, named ROUTER_NAME with INTERFACES_COUNT interfaces.
+`bash device-generator.bash -bgp <BGP_AS_ID> <NEIGHBORS_COUNT> <ROUTER_NAME> <INTERFACES_COUNT>` generates configuration files for a BGP router with BGP_AS_ID as BGP AS (Autonomous System) identificator, with NEIGHBORS_COUNT BGP neighbors, named ROUTER_NAME with INTERFACES_COUNT interfaces.
 
-Example: `bash device-generator.bash -bgp 10 2 1 bgprouter 3` generates a BGP router with three interfaces, BGP AS (Autonomous System) id 10, two neighbors and one announcement to do.
+Example: `bash device-generator.bash -bgp 10 2 bgprouter 3` generates a BGP router with three interfaces, BGP AS (Autonomous System) id 10 and two neighbors.
 
 ### Client
 
