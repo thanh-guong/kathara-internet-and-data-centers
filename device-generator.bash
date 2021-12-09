@@ -56,7 +56,7 @@ while [ $# -gt 0 ]; do
 			bgp='true'
 			as_bgp_id=$2
 			neighbors_count=$3
-			shift 4
+			shift 3
 			;;
 		-z)
 			zone=$2
