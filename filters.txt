@@ -1,0 +1,27 @@
+! prefix filtering
+! attach prefix lists to neighbor (max 1 for each neighbor)
+neighbor <NEIGHBOR_IP_ADDRESS> prefix-list <PL_NAME> in
+neighbor <NEIGHBOR_IP_ADDRESS> prefix-list <PL_NAME> out
+
+! attributes (max 1 for each neighbor)
+! attach route maps to neighbor (max 1 for each neighbor)
+neighbor <NEIGHBOR_IP_ADDRESS> route-map <RM_NAME> in
+neighbor <NEIGHBOR_IP_ADDRESS> route-map <RM_NAME> out
+
+! prefix filtering (0 to many for each prefix-list declared)
+! prefix lists definition
+ip prefix-list <PL-NAME> permit <NETWORK_ADDRESS>/<PREFIX>
+ip prefix-list <PL-NAME> deny <NETWORK_ADDRESS>/<PREFIX>
+ip prefix-list <PL-NAME> permit any
+ip prefix-list <PL-NAME> deny any
+
+! attributes
+route-map <RM_NAME> permit|deny <SEQ_NUMBER>
+match ip address <ACL_NAME>
+set local-preference <LOCAL_PREF_VALUE>
+set metric <METRIC_VALUE>
+
+route-map <RM_NAME> permit|deny <SEQ_NUMBER>
+
+! access lists definition
+access-list <ACL_NAME> permit <NETWORK_ADDRESS>/<PREFIX> exact-match
