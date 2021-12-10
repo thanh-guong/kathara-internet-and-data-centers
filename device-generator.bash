@@ -82,6 +82,12 @@ touch $device_name.startup
 echo > $device_name.startup
 
 # ===============================================================================================================================================
+# IF CLIENT
+if [ -z "$rip$ospf$bgp$zone$is_server" ]; then
+	echo "route add default gw <GATEWAY_IP>" >> $device_name.startup
+fi
+
+# ===============================================================================================================================================
 # INTERFACES
 echo "$interfaces_count interfaces required, configuring them..."
 
